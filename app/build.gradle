@@ -2,8 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda' //retrolambda
 apply plugin: 'com.neenbedankt.android-apt'
 
-configurations { natives }
-
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
@@ -16,10 +14,6 @@ android {
         applicationId "net.juude.droidviews"
         minSdkVersion 15
         targetSdkVersion 22
-        ndk {
-            moduleName "jni"
-            ldLibs "log"
-        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,7 +36,7 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs = ['libs']
+//            jniLibs.srcDirs = ['libs']
             assets.srcDirs = ['src/main/assets-particle', 'src/main/assets-raw', 'src/main/assets']
         }
     }
@@ -68,7 +62,6 @@ dependencies {
     provided 'org.glassfish:javax.annotation:10.0-b28'
     apt 'com.android.databinding:compiler:1.0-rc0'
     compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'net.juude.droidviews:droidViews:1.0'
     compile 'com.squareup:otto:1.3.8'
     compile 'com.facebook.rebound:rebound:0.3.8'
     apt "org.androidannotations:androidannotations:$AAVersion"
@@ -79,10 +72,6 @@ dependencies {
     compile 'com.alibaba:fastjson:1.1.25'
     compile 'com.malinskiy:superrecyclerview:1.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
 }
 
@@ -90,33 +79,5 @@ dependencies {
 apt {
     arguments {
         androidManifestFile variant.outputs[0].processResources.manifestFile
-        // if you have multiple outputs (when using splits), you may want to have other index than 0
-
-        // you should set your package name here if you are using different application IDs
-        // resourcePackageName "your.package.name"
-
-        // You can set optional annotation processing options here, like these commented options:
-        // logLevel 'INFO'
-        // logFile '/var/log/aa.log'
-    }
-}
-
-task copyAndroidNatives() {
-    file("libs/armeabi/").mkdirs();
-    file("libs/armeabi-v7a/").mkdirs();
-    file("libs/x86/").mkdirs();
-
-    configurations.natives.files.each { jar ->
-        def outputDir = null
-        if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-        if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-        if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-        if (outputDir != null) {
-            copy {
-                from zipTree(jar)
-                into outputDir
-                include "*.so"
-            }
-        }
     }
 }
